@@ -2,9 +2,24 @@ use crate::paths;
 use serde::Deserialize;
 use std::fs;
 
+#[derive(Debug, Deserialize, Default, Clone, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum DistillationMode {
+    Debug,
+    #[serde(alias = "conservative")]
+    Conservative,
+    #[default]
+    Balanced,
+    Efficient,
+    #[serde(alias = "aggressive")]
+    Aggressive,
+    Auto,
+}
+
 #[derive(Debug, Deserialize, Default, Clone)]
 pub struct AgentConfig {
-    pub aggressiveness: Option<String>, // "conservative" | "balanced" | "aggressive"
+    #[serde(alias = "aggressiveness")]
+    pub mode: Option<DistillationMode>,
     pub enable_readfile_distillation: Option<bool>,
     pub enable_grep_distillation: Option<bool>,
     pub enable_webfetch_distillation: Option<bool>,
@@ -12,10 +27,12 @@ pub struct AgentConfig {
 
 impl AgentConfig {
     pub fn route_thresholds(&self) -> (f32, f32) {
-        match self.aggressiveness.as_deref().unwrap_or("balanced") {
-            "conservative" => (0.75, 0.40),
-            "aggressive" => (0.60, 0.20),
-            _ => (0.70, 0.30), // balanced default
+        let mode = self.mode.clone().unwrap_or(DistillationMode::Balanced);
+        match mode {
+            DistillationMode::Debug => (0.90, 0.50),
+            DistillationMode::Conservative => (0.75, 0.40),
+            DistillationMode::Efficient | DistillationMode::Aggressive => (0.60, 0.20),
+            DistillationMode::Balanced | DistillationMode::Auto => (0.70, 0.30),
         }
     }
 
