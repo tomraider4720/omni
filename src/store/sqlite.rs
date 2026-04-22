@@ -264,6 +264,19 @@ impl Store {
                 ts UNINDEXED,
                 tokenize = 'porter ascii'
             );
+
+            -- 6. Execution traces
+            CREATE TABLE IF NOT EXISTS execution_traces (
+                id INTEGER PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                ts INTEGER NOT NULL,
+                command TEXT NOT NULL,
+                agent_id TEXT NOT NULL,
+                project_path TEXT NOT NULL,
+                raw_input TEXT NOT NULL,
+                distilled_output TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_traces_ts ON execution_traces(ts);
             "#,
         )?;
 
@@ -382,6 +395,41 @@ impl Store {
                     "[omni:error] hint: legacy 'content_type' column may be blocking inserts. OMNI will attempt auto-migration on next startup."
                 );
             }
+        }
+    }
+
+    pub fn record_trace(
+        &self,
+        session_id: &str,
+        command: &str,
+        agent_id: &str,
+        project_path: &str,
+        raw_input: &str,
+        distilled_output: &str,
+    ) {
+        let conn = match self.conn.lock() {
+            Ok(c) => c,
+            Err(_) => return,
+        };
+
+        let ts = chrono::Utc::now().timestamp();
+        let res = conn.execute(
+            "INSERT INTO execution_traces 
+             (session_id, ts, command, agent_id, project_path, raw_input, distilled_output)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+            params![
+                session_id,
+                ts,
+                command,
+                agent_id,
+                project_path,
+                raw_input,
+                distilled_output,
+            ],
+        );
+
+        if let Err(e) = res {
+            eprintln!("[omni:error] failed to record trace: {}", e);
         }
     }
 
@@ -777,6 +825,7 @@ mod tests {
         assert!(tables.contains(&"file_access".to_string()));
         assert!(tables.contains(&"rewind_store".to_string()));
         assert!(tables.contains(&"session_events".to_string())); // Because of fts5, session_events and its shadow tables exist
+        assert!(tables.contains(&"execution_traces".to_string()));
     }
 
     #[test]

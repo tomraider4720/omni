@@ -255,6 +255,14 @@ pub fn process_payload(
             &project_path,
             _agent_id,
         );
+        s.record_trace(
+            &session_id,
+            clean_command,
+            _agent_id,
+            &project_path,
+            &content,
+            &final_out,
+        );
 
         if let Some(ref sess) = session {
             let tracker = crate::session::tracker::SessionTracker::new(sess.clone(), s.clone());
