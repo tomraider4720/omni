@@ -136,9 +136,10 @@ mod tests {
 
     #[test]
     fn test_route_thresholds_logic() {
-        let mut cfg = AgentConfig::default();
-
-        cfg.mode = Some(DistillationMode::Debug);
+        let mut cfg = AgentConfig {
+            mode: Some(DistillationMode::Debug),
+            ..Default::default()
+        };
         assert_eq!(cfg.route_thresholds(), (0.90, 0.50));
 
         cfg.mode = Some(DistillationMode::Aggressive);
