@@ -46,6 +46,22 @@ pub fn detect_agent_id() -> String {
     if std::env::var("AIDER_SESSION").is_ok() {
         return "aider".to_string();
     }
+    // Antigravity IDE detection
+    if std::env::var("ANTIGRAVITY_SESSION").is_ok()
+        || std::env::current_exe()
+            .map(|p| p.to_string_lossy().contains("Antigravity"))
+            .unwrap_or(false)
+    {
+        return "antigravity".to_string();
+    }
+    // VSCode Copilot detection
+    if std::env::var("VSCODE_PID").is_ok()
+        || std::env::var("TERM_PROGRAM")
+            .map(|v| v == "vscode")
+            .unwrap_or(false)
+    {
+        return "vscode".to_string();
+    }
     // Default: claude_code (most common OMNI usage)
     "claude_code".to_string()
 }
@@ -193,6 +209,8 @@ pub fn agent_display_name(agent_id: &str) -> String {
         "aider" => "Aider".to_string(),
         "roo_code" => "Roo Code".to_string(),
         "copilot" => "GitHub Copilot".to_string(),
+        "antigravity" => "Antigravity".to_string(),
+        "vscode" => "VS Code".to_string(),
         other => other.replace('_', " "),
     }
 }
@@ -224,19 +242,26 @@ mod tests {
     }
 
     #[test]
-    fn test_detect_agent_id_default() {
-        // Without any env vars, should default to claude_code
+    fn test_detect_agent_id_default_and_override() {
+        // Combined into one test to avoid env var race conditions in parallel execution.
+        // Test default: Without OMNI_AGENT_ID, should default to claude_code
         unsafe {
             std::env::remove_var("OMNI_AGENT_ID");
             std::env::remove_var("CURSOR_TRACE_ID");
+            std::env::remove_var("CURSOR_SESSION_ID");
             std::env::remove_var("CLINE_TASK_ID");
+            std::env::remove_var("ANTIGRAVITY_SESSION");
+            std::env::remove_var("VSCODE_PID");
+            std::env::remove_var("TERM_PROGRAM");
+            std::env::remove_var("CODEX_SESSION");
+            std::env::remove_var("WINDSURF_SESSION");
+            std::env::remove_var("CONTINUE_SESSION_ID");
+            std::env::remove_var("AIDER_SESSION");
         }
         let id = detect_agent_id();
         assert_eq!(id, "claude_code");
-    }
 
-    #[test]
-    fn test_detect_agent_id_override() {
+        // Test override: OMNI_AGENT_ID takes priority
         unsafe {
             std::env::set_var("OMNI_AGENT_ID", "windsurf");
         }

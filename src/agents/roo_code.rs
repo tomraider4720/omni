@@ -36,8 +36,11 @@ impl AgentIntegration for RooCodeIntegration {
                     "omni".to_string(),
                     json!({
                         "command": exe_path,
-                        "args": ["serve"],
-                        "disabled": false
+                        "args": ["--mcp"],
+                        "disabled": false,
+                        "env": {
+                            "OMNI_AGENT_ID": "roo_code"
+                        }
                     }),
                 );
             }
@@ -84,7 +87,7 @@ impl AgentIntegration for RooCodeIntegration {
         if settings_path.exists()
             && fs::read_to_string(&settings_path)
                 .unwrap_or_default()
-                .contains("\"omni\":")
+                .contains("\"omni\"")
         {
             println!(
                 "   {:<15} {} {}",

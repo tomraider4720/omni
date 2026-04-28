@@ -9,6 +9,7 @@ pub mod multiagent;
 pub mod openclaw;
 pub mod opencode;
 pub mod roo_code;
+pub mod vscode;
 pub mod zed;
 
 pub use antigravity::AntigravityIntegration;
@@ -21,6 +22,7 @@ pub use gemini::GeminiIntegration;
 pub use openclaw::OpenClawIntegration;
 pub use opencode::OpenCodeIntegration;
 pub use roo_code::RooCodeIntegration;
+pub use vscode::VscodeIntegration;
 pub use zed::ZedIntegration;
 
 pub trait AgentIntegration {
@@ -56,5 +58,6 @@ pub fn all_integrations() -> Vec<Box<dyn AgentIntegration>> {
         Box::new(codex::CodexIntegration),
         Box::new(openclaw::OpenClawIntegration),
         Box::new(antigravity::AntigravityIntegration),
+        Box::new(vscode::VscodeIntegration),
     ]
 }

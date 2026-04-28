@@ -1226,7 +1226,10 @@ If you prefer to configure manually, add the `omni` entry to your `mcp_config.js
   "mcpServers": {
     "omni": {
       "command": "/opt/homebrew/bin/omni",
-      "args": ["serve"]
+      "args": ["--mcp"],
+      "env": {
+        "OMNI_AGENT_ID": "antigravity"
+      }
     }
   }
 }

@@ -7,7 +7,6 @@ pub mod optimize;
 pub mod reset;
 pub mod rewind;
 pub mod rewrite;
-pub mod serve;
 pub mod session;
 pub mod stats;
 pub mod update;

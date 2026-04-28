@@ -4,26 +4,24 @@ use serde_json::json;
 use std::fs;
 use std::path::PathBuf;
 
-pub struct AntigravityIntegration;
+pub struct VscodeIntegration;
 
-impl AntigravityIntegration {
-    /// Returns the path to the Antigravity MCP config file.
-    /// macOS/Linux: ~/.gemini/antigravity/mcp_config.json
-    /// Windows:     %USERPROFILE%\.gemini\antigravity\mcp_config.json
+impl VscodeIntegration {
+    /// Returns the path to .vscode/mcp.json in the current working directory.
     fn config_path() -> PathBuf {
-        dirs::home_dir()
-            .unwrap_or_else(|| PathBuf::from("."))
-            .join(".gemini/antigravity/mcp_config.json")
+        std::env::current_dir()
+            .unwrap_or_else(|_| PathBuf::from("."))
+            .join(".vscode/mcp.json")
     }
 }
 
-impl AgentIntegration for AntigravityIntegration {
+impl AgentIntegration for VscodeIntegration {
     fn id(&self) -> &'static str {
-        "antigravity"
+        "vscode"
     }
 
     fn name(&self) -> &'static str {
-        "Antigravity IDE"
+        "VS Code"
     }
 
     fn install(&self, exe_path: &str) -> anyhow::Result<()> {
@@ -40,16 +38,17 @@ impl AgentIntegration for AntigravityIntegration {
             json!({})
         };
 
+        // VSCode uses "servers" (not "mcpServers") per MCP spec
         if let Some(obj) = val.as_object_mut() {
-            let mcp_servers = obj.entry("mcpServers").or_insert_with(|| json!({}));
-            if let Some(servers) = mcp_servers.as_object_mut() {
-                servers.insert(
+            let servers = obj.entry("servers").or_insert_with(|| json!({}));
+            if let Some(servers_obj) = servers.as_object_mut() {
+                servers_obj.insert(
                     "omni".to_string(),
                     json!({
                         "command": exe_path,
                         "args": ["--mcp"],
                         "env": {
-                            "OMNI_AGENT_ID": "antigravity"
+                            "OMNI_AGENT_ID": "vscode"
                         }
                     }),
                 );
@@ -58,7 +57,7 @@ impl AgentIntegration for AntigravityIntegration {
 
         fs::write(&config_path, serde_json::to_string_pretty(&val)?)?;
         println!(
-            "  {} Configured MCP Server in ~/.gemini/antigravity/mcp_config.json",
+            "  {} Configured MCP Server in .vscode/mcp.json",
             "✓".green()
         );
         Ok(())
@@ -77,14 +76,14 @@ impl AgentIntegration for AntigravityIntegration {
         };
 
         if let Some(obj) = val.as_object_mut()
-            && let Some(servers) = obj.get_mut("mcpServers").and_then(|v| v.as_object_mut())
+            && let Some(servers) = obj.get_mut("servers").and_then(|v| v.as_object_mut())
         {
             servers.remove("omni");
         }
 
         fs::write(&config_path, serde_json::to_string_pretty(&val)?)?;
         println!(
-            "  {} Removed MCP Server from ~/.gemini/antigravity/mcp_config.json",
+            "  {} Removed MCP Server from .vscode/mcp.json",
             "✓".yellow()
         );
         Ok(())
@@ -93,7 +92,7 @@ impl AgentIntegration for AntigravityIntegration {
     fn doctor_check(&self, _fix_mode: bool, _warnings: &mut Vec<String>) -> bool {
         let config_path = Self::config_path();
 
-        println!("\n  {}", "Antigravity IDE:".cyan());
+        println!("\n  {}", "VS Code:".cyan());
         if config_path.exists()
             && fs::read_to_string(&config_path)
                 .unwrap_or_default()
@@ -102,7 +101,7 @@ impl AgentIntegration for AntigravityIntegration {
             println!(
                 "   {:<15} {} {}",
                 "Config:".bright_black(),
-                "~/.gemini/antigravity/mcp_config.json".bright_black(),
+                ".vscode/mcp.json".bright_black(),
                 "[OK]".green().bold()
             );
             true

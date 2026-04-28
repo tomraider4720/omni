@@ -38,8 +38,11 @@ impl AgentIntegration for CopilotIntegration {
                     "omni".to_string(),
                     json!({
                         "command": exe_path,
-                        "args": ["serve"],
-                        "type": "stdio"
+                        "args": ["--mcp"],
+                        "type": "stdio",
+                        "env": {
+                            "OMNI_AGENT_ID": "copilot"
+                        }
                     }),
                 );
             }
@@ -90,7 +93,7 @@ impl AgentIntegration for CopilotIntegration {
         if settings_path.exists()
             && fs::read_to_string(&settings_path)
                 .unwrap_or_default()
-                .contains("\"omni\":")
+                .contains("\"omni\"")
         {
             println!(
                 "   {:<15} {} {}",

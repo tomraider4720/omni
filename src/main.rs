@@ -241,18 +241,6 @@ fn main() {
                     }
                 }
 
-                "serve" => {
-                    let port: u16 = args
-                        .iter()
-                        .find(|a| a.starts_with("--port="))
-                        .and_then(|a| a["--port=".len()..].parse().ok())
-                        .unwrap_or(7891);
-                    if let Err(e) = cli::serve::run_http_server(port) {
-                        eprintln!("[omni] Server error: {}", e);
-                        std::process::exit(1);
-                    }
-                }
-
                 "stats" => match Store::open() {
                     Ok(store) => {
                         if let Err(e) = cli::stats::run(&args, &store) {

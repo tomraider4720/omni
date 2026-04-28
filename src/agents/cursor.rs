@@ -38,7 +38,10 @@ impl AgentIntegration for CursorIntegration {
                     "omni".to_string(),
                     json!({
                         "command": exe_path,
-                        "args": ["serve"]
+                        "args": ["--mcp"],
+                        "env": {
+                            "OMNI_AGENT_ID": "cursor"
+                        }
                     }),
                 );
             }
@@ -89,7 +92,7 @@ impl AgentIntegration for CursorIntegration {
         if mcp_path.exists()
             && fs::read_to_string(&mcp_path)
                 .unwrap_or_default()
-                .contains("\"omni\":")
+                .contains("\"omni\"")
         {
             println!(
                 "   {:<15} {} {}",

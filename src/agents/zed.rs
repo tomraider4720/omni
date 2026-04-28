@@ -38,7 +38,10 @@ impl AgentIntegration for ZedIntegration {
                     "omni".to_string(),
                     json!({
                         "command": exe_path,
-                        "args": ["serve"]
+                        "args": ["--mcp"],
+                        "env": {
+                            "OMNI_AGENT_ID": "zed"
+                        }
                     }),
                 );
             }
@@ -91,7 +94,7 @@ impl AgentIntegration for ZedIntegration {
         if settings_path.exists()
             && fs::read_to_string(&settings_path)
                 .unwrap_or_default()
-                .contains("\"omni\":")
+                .contains("\"omni\"")
         {
             println!(
                 "   {:<15} {} {}",

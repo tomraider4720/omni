@@ -131,6 +131,7 @@ fn agent_display_name(agent_id: &str) -> &str {
         "codex" => "Codex CLI",
         "openclaw" => "OpenClaw",
         "antigravity" => "Antigravity",
+        "vscode" => "VS Code",
         other => other,
     }
 }
