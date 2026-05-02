@@ -30,7 +30,7 @@ pub fn run_rewind(args: &[String], store: &Store) -> Result<()> {
         }
         _ => {
             // Default to list if it looks like a hash or unknown
-            if subcmd.len() == 8 {
+            if subcmd.len() >= 8 {
                 show_rewind(store, subcmd)
             } else {
                 list_rewinds(store)

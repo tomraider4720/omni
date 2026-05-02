@@ -486,7 +486,7 @@ impl Store {
         hasher.update(content.as_bytes());
         let hash_result = hasher.finalize();
         let full_hash = hex::encode(hash_result);
-        let short_hash = full_hash[..8].to_string();
+        let short_hash = full_hash[..16].to_string();
 
         let conn = match self.conn.lock() {
             Ok(c) => c,
@@ -1214,7 +1214,7 @@ mod tests {
         let content = "this is some compressed content";
         let hash = store.store_rewind(content);
 
-        assert_eq!(hash.len(), 8);
+        assert_eq!(hash.len(), 16);
 
         let retrieved = store.retrieve_rewind(&hash);
         assert_eq!(retrieved, Some(content.to_string()));
