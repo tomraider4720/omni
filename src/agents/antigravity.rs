@@ -112,7 +112,7 @@ impl AgentIntegration for AntigravityIntegration {
                 "Config:".bright_black(),
                 "not configured".bright_black()
             );
-            false
+            true
         }
     }
 }

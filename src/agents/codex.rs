@@ -98,7 +98,7 @@ impl AgentIntegration for CodexIntegration {
                 "Config:".bright_black(),
                 "not configured".bright_black()
             );
-            false
+            true
         }
     }
 }

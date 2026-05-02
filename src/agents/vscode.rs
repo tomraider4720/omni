@@ -111,7 +111,7 @@ impl AgentIntegration for VscodeIntegration {
                 "Config:".bright_black(),
                 "not configured".bright_black()
             );
-            false
+            true
         }
     }
 }

@@ -109,7 +109,7 @@ impl AgentIntegration for ZedIntegration {
                 "Config:".bright_black(),
                 "not configured".bright_black()
             );
-            false
+            true
         }
     }
 }

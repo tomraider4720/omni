@@ -13,6 +13,7 @@ struct HookInput {
     #[serde(rename = "sessionId", alias = "session_id")]
     session_id: String,
     #[serde(rename = "workingDirectory", alias = "working_directory")]
+    #[serde(alias = "cwd")]
     working_directory: String,
 }
 
@@ -430,6 +431,31 @@ mod tests {
         let (store, _dir) = get_store();
         let out = process_payload("NOT JSON", store, default_config());
         assert!(out.is_none());
+    }
+
+    #[test]
+    fn test_claude_code_cwd_alias_accepted() {
+        // Claude Code sends "cwd" not "workingDirectory" — this must not produce a parse error
+        let (store, _dir) = get_store();
+        // Claude Code sends "cwd" and snake_case field names (from actual hook transcripts)
+        let input = json!({
+            "hook_event_name": "SessionStart",
+            "session_id": "4ba52c00-c43f-46ed-9e0e-9069d5294302",
+            "transcript_path": "/home/user/.claude/projects/test/session.jsonl",
+            "cwd": "/home/user/project",
+            "source": "startup",
+            "model": "claude-sonnet-4-6"
+        });
+
+        let out = process_payload(&input.to_string(), store.clone(), default_config());
+        // Fresh session with no toolchain → no watch_paths → None output is correct
+        // The important thing is: no "[omni] parse error", session IS written to DB
+        assert!(out.is_none());
+        // Verify the session was actually persisted
+        assert!(
+            store.find_latest_session().is_some(),
+            "session must be written to DB when cwd alias is used"
+        );
     }
 
     #[test]

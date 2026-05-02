@@ -108,7 +108,7 @@ impl AgentIntegration for GeminiIntegration {
                 "Config:".bright_black(),
                 "not configured".bright_black()
             );
-            false
+            true
         }
     }
 }
