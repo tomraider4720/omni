@@ -107,7 +107,7 @@ impl AgentIntegration for CursorIntegration {
                 "Config:".bright_black(),
                 "not configured".bright_black()
             );
-            true
+            false
         }
     }
 }
