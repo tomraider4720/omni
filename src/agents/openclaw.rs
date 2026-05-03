@@ -118,7 +118,7 @@ impl AgentIntegration for OpenClawIntegration {
                 "Plugin:".bright_black(),
                 "not installed".bright_black()
             );
-            true
+            false
         }
     }
 }
