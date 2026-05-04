@@ -325,8 +325,7 @@ mod tests {
         patch_hermes_config(&path, "/usr/bin/omni").unwrap();
         let after_second = fs::read_to_string(&path).unwrap();
         assert_eq!(
-            after_first,
-            after_second,
+            after_first, after_second,
             "patching twice must be idempotent"
         );
     }
@@ -337,8 +336,14 @@ mod tests {
         let (_dir, path) = make_config(content);
         remove_omni_from_hermes_config(&path).unwrap();
         let result = fs::read_to_string(&path).unwrap();
-        assert!(!result.contains("command: /usr/bin/omni"), "omni entry must be gone");
-        assert!(result.contains("filesystem"), "other entries must be preserved");
+        assert!(
+            !result.contains("command: /usr/bin/omni"),
+            "omni entry must be gone"
+        );
+        assert!(
+            result.contains("filesystem"),
+            "other entries must be preserved"
+        );
     }
 
     #[test]
