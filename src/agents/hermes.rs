@@ -45,7 +45,10 @@ pub fn patch_hermes_config(path: &PathBuf, exe_path: &str) -> anyhow::Result<()>
     // Ensure mcp_servers exists
     let mcp_key = YamlValue::String("mcp_servers".to_string());
     if !doc.contains_key(&mcp_key) {
-        doc.insert(mcp_key.clone(), YamlValue::Mapping(serde_yaml::Mapping::new()));
+        doc.insert(
+            mcp_key.clone(),
+            YamlValue::Mapping(serde_yaml::Mapping::new()),
+        );
     }
 
     let mcp_servers = doc
@@ -56,7 +59,10 @@ pub fn patch_hermes_config(path: &PathBuf, exe_path: &str) -> anyhow::Result<()>
     let omni_key = YamlValue::String("omni".to_string());
     if mcp_servers.contains_key(&omni_key) {
         // Already present — update the command in case the binary moved
-        if let Some(entry) = mcp_servers.get_mut(&omni_key).and_then(|v| v.as_mapping_mut()) {
+        if let Some(entry) = mcp_servers
+            .get_mut(&omni_key)
+            .and_then(|v| v.as_mapping_mut())
+        {
             entry.insert(
                 YamlValue::String("command".to_string()),
                 YamlValue::String(exe_path.to_string()),
@@ -224,9 +230,8 @@ impl AgentIntegration for HermesIntegration {
                 "MCP Server:".bright_black(),
                 "[WARNING] not configured".yellow().bold()
             );
-            warnings.push(
-                "Hermes MCP server not configured. Run `omni install hermes`.".to_string(),
-            );
+            warnings
+                .push("Hermes MCP server not configured. Run `omni install hermes`.".to_string());
             all_ok = false;
         }
 
@@ -256,9 +261,7 @@ impl AgentIntegration for HermesIntegration {
                 "Plugin:".bright_black(),
                 "[WARNING] not installed".yellow()
             );
-            warnings.push(
-                "Hermes plugin not installed. Run `omni install hermes`.".to_string(),
-            );
+            warnings.push("Hermes plugin not installed. Run `omni install hermes`.".to_string());
             all_ok = false;
         }
 
@@ -306,7 +309,10 @@ mod tests {
         let (_dir, path) = make_config(content);
         patch_hermes_config(&path, "/usr/bin/omni").unwrap();
         let result = fs::read_to_string(&path).unwrap();
-        assert!(result.contains("filesystem"), "must preserve existing entries");
+        assert!(
+            result.contains("filesystem"),
+            "must preserve existing entries"
+        );
         assert!(result.contains("omni"), "must add omni entry");
     }
 
@@ -318,7 +324,11 @@ mod tests {
         let after_first = fs::read_to_string(&path).unwrap();
         patch_hermes_config(&path, "/usr/bin/omni").unwrap();
         let after_second = fs::read_to_string(&path).unwrap();
-        assert_eq!(after_first, after_second, "patching twice must be idempotent");
+        assert_eq!(
+            after_first,
+            after_second,
+            "patching twice must be idempotent"
+        );
     }
 
     #[test]
