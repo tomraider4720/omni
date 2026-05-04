@@ -57,6 +57,7 @@ indicatif = "0.17"   # progress bars for heavy operations
 
 # Config (TOML DSL filters)
 toml = "0.8"
+serde_yaml = "0.9"
 
 # Terminal detection
 is-terminal = "0.4"
