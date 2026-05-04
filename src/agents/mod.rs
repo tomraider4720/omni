@@ -5,6 +5,7 @@ pub mod codex;
 pub mod copilot;
 pub mod cursor;
 pub mod gemini;
+pub mod hermes;
 pub mod multiagent;
 pub mod openclaw;
 pub mod opencode;
@@ -19,6 +20,7 @@ pub use codex::CodexIntegration;
 pub use copilot::CopilotIntegration;
 pub use cursor::CursorIntegration;
 pub use gemini::GeminiIntegration;
+pub use hermes::HermesIntegration;
 pub use openclaw::OpenClawIntegration;
 pub use opencode::OpenCodeIntegration;
 pub use roo_code::RooCodeIntegration;
@@ -57,6 +59,7 @@ pub fn all_integrations() -> Vec<Box<dyn AgentIntegration>> {
         Box::new(opencode::OpenCodeIntegration),
         Box::new(codex::CodexIntegration),
         Box::new(openclaw::OpenClawIntegration),
+        Box::new(hermes::HermesIntegration),
         Box::new(antigravity::AntigravityIntegration),
         Box::new(vscode::VscodeIntegration),
     ]

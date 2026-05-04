@@ -1,0 +1,6 @@
+id: omni-signal-engine
+name: Omni Signal Engine
+version: "1.0.0"
+description: "Token-efficient terminal execution via omni. Filters noise from command output before it reaches the LLM."
+required_binaries:
+  - omni
